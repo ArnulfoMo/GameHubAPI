@@ -3,7 +3,7 @@ from typing import Optional
 from datetime import date
 import re
 
-class Player(BaseModel):
+class Category(BaseModel):
     id: Optional[int] = Field(
         default=None,
         description="ID autoincrementable de la categoría."
