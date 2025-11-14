@@ -4,23 +4,21 @@ import logging
 
 from fastapi import HTTPException
 
-from models.players import Player
+from models.games import Game
 from utils.database import execute_query_json
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-async def get_one( id:int ) -> Player:
+async def get_one( id:int ) -> Game:
 
     selectscript = """
         SELECT [id]
-            ,[firstname]
-            ,[lastname]
-            ,[nickname]
-            ,[email]
-            ,[birth_date]
-        FROM [gamehub].[players]
+            ,[categories_id]
+            ,[title]
+            ,[release_date]
+        FROM [gamehub].[games]
         WHERE [id] = ?;
     """
 
@@ -40,16 +38,14 @@ async def get_one( id:int ) -> Player:
     except Exception as e:
         raise HTTPException(status_code=404, detail=f"Database error { str(e) }")
     
-async def get_all() -> list[Player]:
+async def get_all() -> list[Game]:
 
     selectscript = """
         SELECT [id]
-            ,[firstname]
-            ,[lastname]
-            ,[nickname]
-            ,[email]
-            ,[birth_date]
-        FROM [gamehub].[players]
+            ,[categories_id]
+            ,[title]
+            ,[release_date]
+        FROM [gamehub].[games]
     """
 
     result_dict = []
@@ -62,19 +58,17 @@ async def get_all() -> list[Player]:
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Database error: { str(e) }")
     
-async def create_player( player: Player ) -> Player:
+async def create_game( game: Game ) -> Game:
     
     createscript = """
-        INSERT INTO [gamehub].[players] ( [firstname] ,[lastname] ,[nickname] ,[email] ,[birth_date]) 
-        VALUES ( ?, ?, ?, ? ,? );
+        INSERT INTO [gamehub].[games] ( [categories_id] ,[title] ,[release_date]) 
+        VALUES ( ?, ?, ?);
     """
 
     params = (
-        player.firstname
-        , player.lastname
-        , player.nickname
-        , player.email
-        , player.birth_date
+        game.categories_id
+        , game.title
+        , game.release_date
     )
 
     insert_result = None
@@ -86,16 +80,14 @@ async def create_player( player: Player ) -> Player:
     
     sqlfind: str = """
         SELECT [id]
-            ,[firstname]
-            ,[lastname]
-            ,[nickname]
-            ,[email]
-            ,[birth_date]
-        FROM [gamehub].[players]
-        WHERE [nickname] = ?;
+            ,[categories_id]
+            ,[title]
+            ,[release_date]
+        FROM [gamehub].[games]
+        WHERE [id] = ?;
     """
 
-    params = [player.nickname]
+    params = [game.id]
 
     try:
         result = await execute_query_json(sqlfind, params=params)
@@ -110,22 +102,22 @@ async def create_player( player: Player ) -> Player:
     except Exception as e:
         raise HTTPException(status_code=404, detail=f"Database error { str(e) }")
 
-async def update_player( player:Player ) -> Player:
+async def update_game( game:Game ) -> Game:
 
-    dict = player.model_dump(exclude_none=True)
+    dict = game.model_dump(exclude_none=True)
 
     keys = [ k for k in  dict.keys() ]
     keys.remove('id')
     variables = " = ?, ".join(keys)+" = ?"
 
     updatescript = f"""
-        UPDATE [gamehub].[players]
+        UPDATE [gamehub].[games]
         SET {variables}
         WHERE [id] = ?;
     """
 
     params = [ dict[v] for v in keys ]
-    params.append( player.id )
+    params.append( game.id )
 
     update_result = None
     try:
@@ -135,16 +127,14 @@ async def update_player( player:Player ) -> Player:
 
     sqlfind: str = """
         SELECT [id]
-            ,[firstname]
-            ,[lastname]
-            ,[nickname]
-            ,[email]
-            ,[birth_date]
-        FROM [gamehub].[players]
+            ,[categories_id]
+            ,[title]
+            ,[release_date]
+        FROM [gamehub].[games]
         WHERE [id] = ?;
     """
 
-    params = [player.id]
+    params = [game.id]
 
     result_dict=[]
     try:
@@ -158,10 +148,10 @@ async def update_player( player:Player ) -> Player:
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Database error: { str(e) }")
 
-async def delete_player( id:int ) -> str:
+async def delete_game( id:int ) -> str:
 
     deletescript = """
-        DELETE FROM [gamehub].[players]
+        DELETE FROM [gamehub].[games]
         WHERE [id] = ?
     """
 
