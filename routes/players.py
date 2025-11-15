@@ -1,5 +1,7 @@
 from fastapi import APIRouter, status
+
 from models.players import Player
+from models.players_games import PlayerGame
 
 from controllers.players import (
     get_one
@@ -7,7 +9,13 @@ from controllers.players import (
     , create_player
     , update_player
     , delete_player
+    #PLAYER_GAMES
+    , get_one_game
+    , get_all_games
+    , add_game
+    , remove_game
 )
+
 
 router = APIRouter(prefix="/players")
 
@@ -37,6 +45,24 @@ async def delete_player_content( id:int ):
     status: str = await delete_player(id)
     return status
 
+### INTERACTION WITH GAMES ###
 
+@router.get("/{id}/games/{game_id}", tags=["Players"], status_code=status.HTTP_200_OK)
+async def get_one_game_of_player( id:int, game_id:int ):
+    result = await get_one_game(id, game_id)
+    return result
 
+@router.get( "/{id}/games", tags=["Players"], status_code=status.HTTP_200_OK)
+async def get_all_games_of_player( id:int ):
+    result = await get_all_games(id)
+    return result
 
+@router.post( "/{id}/games", tags=["Players"], status_code=status.HTTP_201_CREATED)
+async def assing_game_to_player( id:int, game_data: PlayerGame ):
+    result = await add_game(id, game_data.game_id)
+    return result
+
+@router.delete("/{id}/games/{game_id}", tags=["Players"], status_code=status.HTTP_204_NO_CONTENT)
+async def remove_game_of_player( id:int, game_id:int ):
+    status: str = await remove_game( id, game_id)
+    return status

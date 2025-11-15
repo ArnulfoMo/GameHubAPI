@@ -7,7 +7,7 @@
 ######################################################################
 
 # --- Config ---
-VERSION=0.1.2
+VERSION=0.1.4
 ACR_PRD=devgamehubcr
 IMAGE_LOCAL=gamehub-api
 REPO_PROD=${ACR_PRD}.azurecr.io/gamehub-api

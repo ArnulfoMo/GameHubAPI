@@ -6,6 +6,10 @@ from fastapi import HTTPException
 from models.players import Player
 from utils.database import execute_query_json
 
+from models.players_games import PlayerGame
+
+from datetime import datetime
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -171,3 +175,123 @@ async def delete_player( id:int ) -> str:
         return "DELETED"
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Database error: { str(e) }")
+    
+
+
+
+
+    ### PLAYERS_GAMES INTERACTION
+
+async def get_one_game( player_id: int, game_id:int ) -> PlayerGame:
+
+    selectscript = """
+        SELECT pc.player_id
+            ,p.nickname 
+            ,pc.game_id
+            ,g.title
+            ,pc.registered_date
+        FROM gamehub.players_games pc 
+        INNER JOIN gamehub.players p  ON pc.player_id = p.id 
+        INNER JOIN gamehub.games g ON pc.game_id = g.id
+        WHERE pc.player_id = ?
+        and pc.game_id = ?;
+    """
+
+    params = [player_id, game_id]
+
+    try:
+        result = await execute_query_json(selectscript, params=params)
+        result_dict = json.loads(result)
+
+        #Validacion de elemento vacio
+        if len(result_dict) == 0:
+            raise HTTPException(status_code=404, detail="No games found for the player")
+        
+        return result_dict[0]
+    except Exception as e:
+        raise HTTPException(status_code=404, detail=f"Database error { str(e) }")
+    
+async def get_all_games( player_id: int ) -> list[PlayerGame]:
+
+    selectscript = """
+        SELECT pc.player_id
+            ,p.nickname 
+            ,pc.game_id
+            ,g.title
+            ,pc.registered_date
+        FROM gamehub.players_games pc 
+        INNER JOIN gamehub.players p  ON pc.player_id = p.id 
+        INNER JOIN gamehub.games g ON pc.game_id = g.id
+        WHERE pc.player_id = ?;
+    """
+
+    params=[player_id]
+
+    try:
+        result = await execute_query_json(selectscript, params=params)
+        result_dict = json.loads(result)
+
+        #Validacion de elemento vacio
+        if len(result_dict) == 0:
+            raise HTTPException(status_code=404, detail="No games found for the player")
+        
+        return result_dict
+    except Exception as e:
+        raise HTTPException(status_code=404, detail=f"Database error { str(e) }")
+    
+async def add_game( player_id: int, game_id:int ) -> PlayerGame:
+    
+    createscript = """
+        INSERT INTO [gamehub].[players_games] ( [player_id] ,[game_id] ,[registered_date]) 
+        VALUES ( ?, ?, ?);
+    """
+
+    params = (
+        player_id
+        , game_id
+        , datetime.now()
+    )
+
+
+    try:
+        insert_result = await execute_query_json( createscript, params, needs_commit=True )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Database error: { str(e) }")
+    
+    sqlfind: str = """
+        SELECT pc.player_id
+            ,p.nickname 
+            ,pc.game_id
+            ,g.title
+            ,pc.registered_date
+        FROM gamehub.players_games pc 
+        INNER JOIN gamehub.players p  ON pc.player_id = p.id 
+        INNER JOIN gamehub.games g ON pc.game_id = g.id
+        WHERE pc.player_id = ?
+        and pc.game_id = ?;
+    """
+
+    params = [player_id, game_id]
+
+    try:
+        result = await execute_query_json(sqlfind, params=params)
+        return json.loads(result)[0]
+    except Exception as e:
+        raise HTTPException(status_code=404, detail=f"Database error { str(e) }")
+
+
+async def remove_game( player_id:int, game_id:int ) -> str:
+
+    deletescript = """
+        DELETE FROM [gamehub].[players_games]
+        WHERE [player_id] = ? AND [game_id] = ?
+    """
+
+    params = [player_id, game_id]
+
+    try:
+        await execute_query_json(deletescript, params=params, needs_commit=True)
+        return "GAME REMOVE"
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Database error: { str(e) }")
+    
