@@ -4,6 +4,7 @@ import logging
 from fastapi import HTTPException
 
 from models.platforms import Platform
+from models.games_platforms import GamePlatform
 from utils.database import execute_query_json
 
 logging.basicConfig(level=logging.INFO)
@@ -156,3 +157,34 @@ async def delete_platform( id:int ) -> str:
         return "DELETED"
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Database error: { str(e) }")
+    
+
+    ### GAMES_PLATFORMS INTERACTION ####
+
+async def get_all_games( platforms_id: int ) -> list[GamePlatform]:
+
+    selectscript = """
+        SELECT gp.games_id as game_id
+            , g.title
+            , gp.platforms_id as platform_id
+            , p.name as platform_name
+            , gp.active
+        FROM gamehub.games_platforms gp
+        INNER JOIN gamehub.platforms p  ON gp.platforms_id = p.id 
+        INNER JOIN gamehub.games g ON gp.games_id = g.id
+        WHERE gp.platforms_id = ?;
+    """
+
+    params=[platforms_id]
+
+    try:
+        result = await execute_query_json(selectscript, params=params)
+        result_dict = json.loads(result)
+
+        #Validacion de elemento vacio
+        if len(result_dict) == 0:
+            raise HTTPException(status_code=404, detail="No games found for the platform")
+        
+        return result_dict
+    except Exception as e:
+        raise HTTPException(status_code=404, detail=f"Database error { str(e) }")

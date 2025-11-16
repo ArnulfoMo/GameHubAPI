@@ -14,13 +14,6 @@ class GamePlatform(BaseModel):
         examples=[2, 8, 15]
     )
 
-    edition: Optional[str] = Field(
-        default=None,
-        description="Edición específica del juego para esta plataforma.",
-        pattern=r"^[A-Za-z0-9ÁÉÍÓÚÜÑáéíóúüñ' \-]+$",
-        examples=["Standard Edition", "Deluxe Edition", "Ultimate Edition"]
-    )
-
     active: Optional[bool] = Field(
         default=True,
         description="Indica si la edición del juego en esta plataforma está activa.",

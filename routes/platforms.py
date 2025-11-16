@@ -1,12 +1,15 @@
 from fastapi import APIRouter, status
 from models.platforms import Platform
 
+
 from controllers.platforms import (
     get_one
     , get_all
     , create_platform
     , update_platform
     , delete_platform
+    #game_platform
+    , get_all_games
 )
 
 router = APIRouter(prefix="/platforms")
@@ -37,6 +40,13 @@ async def delete_platform_information( id:int ):
     status: str = await delete_platform(id)
     return status
 
+
+### games_platforms ### interaction
+
+@router.get( "/{platforms_id}/games", tags=["Platforms"], status_code=status.HTTP_200_OK)
+async def get_all_games_of_platform( id:int ):
+    result = await get_all_games(id)
+    return result
 
 
 
