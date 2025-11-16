@@ -10,6 +10,9 @@ from utils.database import execute_query_json
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# ============================================================
+#                 CRUD OPERATIONS FOR PLATFORMS
+# ============================================================
 
 async def get_one( id:int ) -> Platform:
 
@@ -158,8 +161,10 @@ async def delete_platform( id:int ) -> str:
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Database error: { str(e) }")
     
-
-    ### GAMES_PLATFORMS INTERACTION ####
+    
+# ============================================================
+#          PLATFORM ↔ GAMES RELATION (games_platforms)
+# ============================================================
 
 async def get_all_games( platforms_id: int ) -> list[GamePlatform]:
 

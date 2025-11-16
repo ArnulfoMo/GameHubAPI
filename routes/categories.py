@@ -11,6 +11,10 @@ from controllers.categories import (
 
 router = APIRouter(prefix="/categories")
 
+# ============================================================
+#                  MAIN CRUD FOR CATEGORIES
+# ============================================================
+
 @router.get("/{id}", tags=["Categories"], status_code=status.HTTP_200_OK)
 async def get_one_category( id:int ):
     result: Category = await get_one(id)

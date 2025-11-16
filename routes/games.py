@@ -20,6 +20,10 @@ from controllers.games import (
 
 router = APIRouter(prefix="/games")
 
+# ============================================================
+#                    MAIN CRUD FOR GAMES
+# ============================================================
+
 @router.get("/{id}", tags=["Games"], status_code=status.HTTP_200_OK)
 async def get_one_game( id:int ):
     result: Game = await get_one(id)
@@ -46,15 +50,18 @@ async def delete_game_information( id:int ):
     status: str = await delete_game(id)
     return status
 
-### players_games ### interaction
+# ============================================================
+#             GAME → PLAYERS RELATION (players_games)
+# ============================================================
 
 @router.get( "/{id}/players", tags=["Games"], status_code=status.HTTP_200_OK)
 async def get_all_players_of_game( id:int ):
     result = await get_all_players(id)
     return result
 
-### INTERACTION WITH GAMES_PLATFORMS
-
+# ============================================================
+#            GAME → PLATFORMS RELATION (games_platforms)
+# ============================================================
 
 @router.get("/{id}/platforms/{platforms_id}", tags=["Games"], status_code=status.HTTP_200_OK)
 async def get_one_platform_of_game( id:int, platforms_id:int ):

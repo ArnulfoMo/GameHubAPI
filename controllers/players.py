@@ -14,6 +14,11 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
+# ============================================================
+#                 CRUD OPERATIONS FOR PLAYERS
+# ============================================================
+
+
 async def get_one( id:int ) -> Player:
 
     selectscript = """
@@ -177,10 +182,10 @@ async def delete_player( id:int ) -> str:
         raise HTTPException(status_code=500, detail=f"Database error: { str(e) }")
     
 
+# ============================================================
+#           PLAYER ↔ GAMES RELATION (players_games)
+# ============================================================
 
-
-
-    ### PLAYERS_GAMES INTERACTION
 
 async def get_one_game( player_id: int, game_id:int ) -> PlayerGame:
 

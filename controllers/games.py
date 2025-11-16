@@ -11,6 +11,9 @@ from utils.database import execute_query_json
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# ============================================================
+#                    CRUD OPERATIONS FOR GAMES
+# ============================================================
 
 async def get_one( id:int ) -> Game:
 
@@ -174,8 +177,9 @@ async def delete_game( id:int ) -> str:
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Database error: { str(e) }")
     
-
-    ### PLAYERS_GAMES INTERACION ###
+# ============================================================
+#          GAME ↔ PLAYERS RELATION (players_games)
+# ============================================================
 
 async def get_all_players( game_id: int ) -> list[PlayerGame]:
 
@@ -206,7 +210,9 @@ async def get_all_players( game_id: int ) -> list[PlayerGame]:
         raise HTTPException(status_code=404, detail=f"Database error { str(e) }")
     
 
-    ### GAMES_PLATFORMS INTERACTION ###
+# ============================================================
+#        GAME ↔ PLATFORMS RELATION (games_platforms)
+# ============================================================
 
 async def get_one_platform( games_id: int, platforms_id:int ) -> PlayerGame:
 

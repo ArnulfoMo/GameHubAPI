@@ -9,6 +9,9 @@ from utils.database import execute_query_json
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# ============================================================
+#                CRUD OPERATIONS FOR CATEGORIES
+# ============================================================
 
 async def get_one( id:int ) -> Category:
 
