@@ -17,11 +17,11 @@ class Game(BaseModel):
     title: Optional[str] = Field(
         default=None,
         description="Título del juego.",
-        pattern=r"^[A-Za-z0-9ÁÉÍÓÚÜÑáéíóúüñ' \-]+$",
+        pattern=r"^[\w' :\-!?,.&()]+$",
         examples=["Halo Infinite", "Super Mario Odyssey"]
     )
 
-    release_date: Optional[date] = Field(
+    release_date: Optional[date] = Field(   
         default=None,
         description="Fecha de lanzamiento del juego.",
         examples=["2021-11-15", "2017-10-27"]

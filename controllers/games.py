@@ -18,12 +18,14 @@ logger = logging.getLogger(__name__)
 async def get_one( id:int ) -> Game:
 
     selectscript = """
-        SELECT [id]
-            ,[categories_id]
-            ,[title]
-            ,[release_date]
-        FROM [gamehub].[games]
-        WHERE [id] = ?;
+        SELECT g.id
+            , g.categories_id
+            , c.name as category_name
+            , g.title
+            , g.release_date
+        FROM gamehub.games g
+        INNER JOIN gamehub.categories c on g.categories_id = c.id
+        WHERE g.id = ?;
     """
 
     params = [id]
@@ -45,11 +47,13 @@ async def get_one( id:int ) -> Game:
 async def get_all() -> list[Game]:
 
     selectscript = """
-        SELECT [id]
-            ,[categories_id]
-            ,[title]
-            ,[release_date]
-        FROM [gamehub].[games]
+        SELECT g.id
+            , g.categories_id
+            , c.name as category_name
+            , g.title
+            , g.release_date
+        FROM gamehub.games g
+        INNER JOIN gamehub.categories c on g.categories_id = c.id;
     """
 
     result_dict = []
@@ -93,12 +97,14 @@ async def create_game( game: Game ) -> Game:
         raise HTTPException(status_code=500, detail=f"Database error: { str(e) }")
     
     sqlfind: str = """
-        SELECT [id]
-            ,[categories_id]
-            ,[title]
-            ,[release_date]
-        FROM [gamehub].[games]
-        WHERE [id] = ?;
+        SELECT g.id
+            , g.categories_id
+            , c.name as category_name
+            , g.title
+            , g.release_date
+        FROM gamehub.games g
+        INNER JOIN gamehub.categories c on g.categories_id = c.id
+        WHERE g.id = ?;
     """
 
     params = [new_id]
@@ -140,12 +146,14 @@ async def update_game( game:Game ) -> Game:
         raise HTTPException(status_code=500, detail=f"Database error: { str(e) }")
 
     sqlfind: str = """
-        SELECT [id]
-            ,[categories_id]
-            ,[title]
-            ,[release_date]
-        FROM [gamehub].[games]
-        WHERE [id] = ?;
+        SELECT g.id
+            , g.categories_id
+            , c.name as category_name
+            , g.title
+            , g.release_date
+        FROM gamehub.games g
+        INNER JOIN gamehub.categories c on g.categories_id = c.id
+        WHERE g.id = ?;
     """
 
     params = [game.id]
